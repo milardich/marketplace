@@ -24,7 +24,7 @@ fun ItemsScreen() {
         Text(
             text = "Items screen",
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = Color.Red,
             modifier = Modifier.align(Alignment.CenterHorizontally),
             textAlign = TextAlign.Center,
             fontSize = 25.sp
@@ -43,7 +43,7 @@ fun AddItemScreen() {
         Text(
             text = "Add item screen",
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = Color.Red,
             modifier = Modifier.align(Alignment.CenterHorizontally),
             textAlign = TextAlign.Center,
             fontSize = 25.sp
@@ -61,7 +61,7 @@ fun ProfileScreen() {
         Text(
             text = "Profile screen",
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = Color.Red,
             modifier = Modifier.align(Alignment.CenterHorizontally),
             textAlign = TextAlign.Center,
             fontSize = 25.sp
