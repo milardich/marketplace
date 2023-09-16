@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         auth = Firebase.auth
-        auth.signOut()
+        // auth.signOut()
     }
 
     override fun onStart() {
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         var intent: Intent
 
         if (currentUser != null) {
-            intent = Intent(this, ItemsActivity::class.java)
+            intent = Intent(this, HomeActivity::class.java)
         }
         else {
             intent = Intent(this, LoginActivity::class.java)
