@@ -80,6 +80,8 @@ dependencies {
     implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
     implementation("androidx.navigation:navigation-compose:2.7.2")
     implementation("androidx.compose.material:material:1.5.1")
-
-
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("androidx.activity:activity-ktx:1.7.2")
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
+    implementation("com.google.modernstorage:modernstorage-photopicker:1.0.0-alpha06")
 }
