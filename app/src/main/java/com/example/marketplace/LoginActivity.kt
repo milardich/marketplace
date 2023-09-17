@@ -112,7 +112,7 @@ class LoginActivity : ComponentActivity() {
 
     fun goToItemsActivity() {
         startActivity(
-            Intent(this, HomeActivity::class.java)
+            Intent(this, AddItemActivity::class.java)
         )
     }
 
