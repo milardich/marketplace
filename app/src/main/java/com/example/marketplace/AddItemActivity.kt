@@ -2,6 +2,7 @@ package com.example.marketplace
 
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
@@ -26,12 +27,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.marketplace.ui.theme.MarketplaceTheme
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
+
+val database = Firebase.database.reference
 
 class AddItemActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_item)
+
+        val auth = Firebase.auth
 
         setContent {
             MarketplaceTheme {
@@ -102,11 +110,24 @@ class AddItemActivity : AppCompatActivity() {
 
                     Button(onClick = {
                         // TODO: add new item functionality
+                        var item = Item()
+                        item.name = itemName
+                        item.description = itemDescription
+                        item.location = itemLocation
+                        item.price = itemPrice.toFloat()
+                        item.sellerId = auth.currentUser?.uid
+
+                        addNewItem(item)
+
                     }) {
                         Text(text = "Add new item")
                     }
                 }
             }
         }
+    }
+
+    fun addNewItem(item: Item?) {
+        database.child("items").push().setValue(item)
     }
 }
