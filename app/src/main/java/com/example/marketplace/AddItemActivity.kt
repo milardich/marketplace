@@ -1,5 +1,6 @@
 package com.example.marketplace
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -88,7 +89,7 @@ class AddItemActivity : AppCompatActivity() {
                     OutlinedTextField(
                         value = itemLocation,
                         onValueChange = { itemLocation = it },
-                        label = { Text("Item description") }
+                        label = { Text("Item location") }
                     )
 
                     OutlinedTextField(
@@ -127,21 +128,27 @@ class AddItemActivity : AppCompatActivity() {
                         item.name = itemName
                         item.description = itemDescription
                         item.location = itemLocation
-                        item.price = itemPrice.toFloat()
-                        item.sellerId = auth.currentUser?.uid
+                        item.price = itemPrice.toDouble()
+                        item.sellerId = auth.currentUser?.uid.toString()
 
                         addNewItem(itemUuid, item)
 
-                        // create folder on storage with that uuid and store images there
-                        var storageDirectoryPath = itemUuid.toString() + "/test3sauuid"
-                        var storageDirectoryReference = storage.child(storageDirectoryPath)
+                        // create folder on firebase storage with that uuid and store images there
+                        var index: Int = 0
+                        selectedImageUris.forEach { selectedImageUri ->
+                            var storageDirectoryPath = itemUuid.toString() + "/" + index
+                            var storageDirectoryReference = storage.child(storageDirectoryPath)
 
-                        val source = ImageDecoder.createSource(context.contentResolver, selectedImageUris.get(0))
-                        bitmap.value = ImageDecoder.decodeBitmap(source)
-                        val baos = ByteArrayOutputStream()
-                        bitmap.value!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-                        val data = baos.toByteArray()
-                        var uploadTask = storageDirectoryReference.putBytes(data)
+                            val source = ImageDecoder.createSource(context.contentResolver, selectedImageUri)
+                            bitmap.value = ImageDecoder.decodeBitmap(source)
+                            val baos = ByteArrayOutputStream()
+                            bitmap.value!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                            val data = baos.toByteArray()
+                            var uploadTask = storageDirectoryReference.putBytes(data)
+                            index += 1
+                        }
+
+                        openCreatedItem(itemUuid)
 
                     }) {
                         Text(text = "Add new item")
@@ -153,5 +160,12 @@ class AddItemActivity : AppCompatActivity() {
 
     fun addNewItem(itemUuid: UUID, item: Item?) {
         database.child("items").child(itemUuid.toString()).setValue(item)
+    }
+
+    fun openCreatedItem(itemUuid: UUID) {
+        var openItemIntent: Intent
+        openItemIntent = Intent(this, ItemActivity::class.java)
+        openItemIntent.putExtra("itemUuid", itemUuid.toString())
+        startActivity(openItemIntent)
     }
 }
