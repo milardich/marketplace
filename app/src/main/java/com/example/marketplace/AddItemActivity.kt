@@ -1,7 +1,10 @@
 package com.example.marketplace
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -23,6 +26,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -30,6 +34,9 @@ import com.example.marketplace.ui.theme.MarketplaceTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import java.io.ByteArrayOutputStream
+import java.util.UUID
 
 
 val database = Firebase.database.reference
@@ -40,9 +47,13 @@ class AddItemActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_item)
 
         val auth = Firebase.auth
+        val storage = Firebase.storage.reference
+
 
         setContent {
             MarketplaceTheme {
+                val context = LocalContext.current
+                val bitmap = remember { mutableStateOf<Bitmap?>(null) }
 
                 var itemName by remember { mutableStateOf("") }
                 var itemDescription by remember { mutableStateOf("") }
@@ -109,15 +120,28 @@ class AddItemActivity : AppCompatActivity() {
                     }
 
                     Button(onClick = {
-                        // TODO: add new item functionality
+                        // Add item to db
                         var item = Item()
+                        val itemUuid = UUID.randomUUID()
+
                         item.name = itemName
                         item.description = itemDescription
                         item.location = itemLocation
                         item.price = itemPrice.toFloat()
                         item.sellerId = auth.currentUser?.uid
 
-                        addNewItem(item)
+                        addNewItem(itemUuid, item)
+
+                        // create folder on storage with that uuid and store images there
+                        var storageDirectoryPath = "$itemUuid/test.jpg"
+                        var storageDirectoryReference = storage.child(storageDirectoryPath)
+
+                        val source = ImageDecoder.createSource(context.contentResolver, selectedImageUris.get(0))
+                        bitmap.value = ImageDecoder.decodeBitmap(source)
+                        val baos = ByteArrayOutputStream()
+                        bitmap.value!!.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                        val data = baos.toByteArray()
+                        var uploadTask = storageDirectoryReference.putBytes(data)
 
                     }) {
                         Text(text = "Add new item")
@@ -127,7 +151,7 @@ class AddItemActivity : AppCompatActivity() {
         }
     }
 
-    fun addNewItem(item: Item?) {
-        database.child("items").push().setValue(item)
+    fun addNewItem(itemUuid: UUID, item: Item?) {
+        database.child("items").child(itemUuid.toString()).setValue(item)
     }
 }
