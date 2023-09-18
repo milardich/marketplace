@@ -133,7 +133,7 @@ class AddItemActivity : AppCompatActivity() {
                         addNewItem(itemUuid, item)
 
                         // create folder on storage with that uuid and store images there
-                        var storageDirectoryPath = "$itemUuid/test.jpg"
+                        var storageDirectoryPath = itemUuid.toString() + "/test3sauuid"
                         var storageDirectoryReference = storage.child(storageDirectoryPath)
 
                         val source = ImageDecoder.createSource(context.contentResolver, selectedImageUris.get(0))
