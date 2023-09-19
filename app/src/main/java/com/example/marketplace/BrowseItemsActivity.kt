@@ -89,14 +89,10 @@ class BrowseItemsActivity : AppCompatActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun DisplayItems(itemList: List<Item>) {
-        // You can loop through the itemList and display each item
+
         LazyColumn {
             items(itemList) { item ->
-                // Display item data here
-//                Text(text = "Name: ${item.name}")
-//                Text(text = "Description: ${item.description}")
-//                Text(text = "Price: ${item.price}")
-                // Add more Composables to display other item details
+
                 var mutableImageUris = item.images.split(",").toMutableList()
                 mutableImageUris.remove("")
                 val imageUris = mutableImageUris.toList()
