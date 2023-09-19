@@ -125,6 +125,7 @@ class AddItemActivity : AppCompatActivity() {
                         var item = Item()
                         val itemUuid = UUID.randomUUID()
 
+                        item.itemUuid = itemUuid.toString()
                         item.name = itemName
                         item.description = itemDescription
                         item.location = itemLocation

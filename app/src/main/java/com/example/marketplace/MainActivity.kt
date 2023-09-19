@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         var intent: Intent
 
         if (currentUser != null) {
-            //intent = Intent(this, AddItemActivity::class.java)
+            // intent = Intent(this, AddItemActivity::class.java)
             intent = Intent(this, BrowseItemsActivity::class.java)
         }
         else {

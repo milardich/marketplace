@@ -4,6 +4,9 @@ import android.net.Uri
 import com.google.firebase.database.PropertyName
 
 data class Item(
+    @PropertyName("itemUuid")
+    var itemUuid: String = "",
+
     @PropertyName("name")
     var name: String = "",
 
