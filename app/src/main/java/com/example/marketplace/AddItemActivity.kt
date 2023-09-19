@@ -4,6 +4,8 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -26,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.core.os.HandlerCompat.postDelayed
 import coil.compose.AsyncImage
 import com.example.marketplace.ui.theme.MarketplaceTheme
 import com.google.firebase.auth.ktx.auth
@@ -116,6 +119,7 @@ class AddItemActivity : AppCompatActivity() {
                         }
                     }
 
+
                     Button(onClick = {
                         // Add item to db
                         var item = Item()
@@ -130,6 +134,12 @@ class AddItemActivity : AppCompatActivity() {
                         var itemUrisStringBuilder = StringBuilder()
 
                         // create folder on firebase storage with that uuid and store images there
+                        Toast.makeText(
+                            this@AddItemActivity,
+                            "Uploading images...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
                         var index: Int = 0
                         selectedImageUris.forEach { selectedImageUri ->
                             var storageDirectoryPath = itemUuid.toString() + "/" + index
@@ -142,11 +152,11 @@ class AddItemActivity : AppCompatActivity() {
                                         itemUrisStringBuilder.append(uri.toString())
                                         database.child("items").child(itemUuid.toString()).child("images").setValue(itemUrisStringBuilder.append(",").toString())
 
-                                        Toast.makeText(
-                                            this@AddItemActivity,
-                                            uri.toString(),
-                                            Toast.LENGTH_LONG
-                                        ).show()
+//                                        Toast.makeText(
+//                                            this@AddItemActivity,
+//                                            uri.toString(),
+//                                            Toast.LENGTH_SHORT
+//                                        ).show()
 
                                     }
                                 }
@@ -157,7 +167,10 @@ class AddItemActivity : AppCompatActivity() {
 
                         addNewItem(itemUuid, item)
 
-                        openCreatedItem(itemUuid)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            openCreatedItem(itemUuid)
+                        }, 3000)
+
 
                     }) {
                         Text(text = "Add new item")
