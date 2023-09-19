@@ -20,5 +20,5 @@ data class Item(
     var sellerId: String = "",
 
     @PropertyName("images")
-    var images: List<String> = arrayListOf()
+    var images: String = ""
 )

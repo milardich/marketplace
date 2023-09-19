@@ -32,6 +32,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import java.lang.StringBuilder
 import java.util.UUID
 
 
@@ -126,6 +127,7 @@ class AddItemActivity : AppCompatActivity() {
                         item.price = itemPrice.toDouble()
                         item.sellerId = auth.currentUser?.uid.toString()
 
+                        var itemUrisStringBuilder = StringBuilder()
 
                         // create folder on firebase storage with that uuid and store images there
                         var index: Int = 0
@@ -137,8 +139,8 @@ class AddItemActivity : AppCompatActivity() {
                                 taskSnapshot ->
                                 run {
                                     storageDirectoryReference.downloadUrl.addOnSuccessListener { uri ->
-
-                                        database.child("items").child(itemUuid.toString()).child("images").push().setValue(uri.toString())
+                                        itemUrisStringBuilder.append(uri.toString())
+                                        database.child("items").child(itemUuid.toString()).child("images").setValue(itemUrisStringBuilder.append(",").toString())
 
                                         Toast.makeText(
                                             this@AddItemActivity,
