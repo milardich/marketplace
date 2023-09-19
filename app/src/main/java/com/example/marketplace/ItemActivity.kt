@@ -81,6 +81,8 @@ class ItemActivity : AppCompatActivity() {
                     ItemDetailScreen(itemUuid = itemUuid.toString(), database = database)
 
                 }
+
+                NavigationButtons(context = this)
             }
         }
     }

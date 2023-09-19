@@ -177,6 +177,8 @@ class AddItemActivity : AppCompatActivity() {
                         Text(text = "Add new item")
                     }
                 }
+
+                NavigationButtons(context = this)
             }
         }
     }
