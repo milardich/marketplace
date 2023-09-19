@@ -13,16 +13,21 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -70,25 +75,32 @@ class AddItemActivity : AppCompatActivity() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
                     OutlinedTextField(
                         value = itemName,
                         onValueChange = { itemName = it },
-                        label = { Text("Item name") }
+                        label = { Text("Item name") },
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     OutlinedTextField(
                         value = itemDescription,
                         onValueChange = { itemDescription = it },
-                        label = { Text("Item description") }
+                        label = { Text("Item description") },
+                        modifier = Modifier.fillMaxWidth()
+
                     )
 
                     // TODO: set location using location service
                     OutlinedTextField(
                         value = itemLocation,
                         onValueChange = { itemLocation = it },
-                        label = { Text("Item location") }
+                        label = { Text("Item location") },
+                        modifier = Modifier.fillMaxWidth()
+
                     )
 
                     OutlinedTextField(
@@ -96,24 +108,25 @@ class AddItemActivity : AppCompatActivity() {
                         onValueChange = { itemPrice = it },
                         label = { Text("Item price") },
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
                     )
 
                     Button(onClick = {
                         multiplePhotoPickerLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
-                    }) {
+                    }, modifier = Modifier.fillMaxWidth()) {
                         Text(text = "Pick multiple photos")
                     }
 
                     LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 128.dp)
+                        columns = GridCells.Adaptive(minSize = 100.dp)
                     ) {
                         items(selectedImageUris) { uri ->
                             AsyncImage(
                                 model = uri,
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxWidth(),
+                                //modifier = Modifier.fillMaxWidth(),
                                 contentScale = ContentScale.Crop
                             )
                         }
@@ -173,11 +186,13 @@ class AddItemActivity : AppCompatActivity() {
                         }, 3000)
 
 
-                    }) {
+                    }, modifier = Modifier.fillMaxWidth()) {
                         Text(text = "Add new item")
                     }
                 }
-
+                
+                Spacer(modifier = Modifier.padding(50.dp))
+                
                 NavigationButtons(context = this)
             }
         }

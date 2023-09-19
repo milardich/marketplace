@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,8 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.marketplace.ui.theme.MarketplaceTheme
 import com.google.firebase.auth.ktx.auth
@@ -73,10 +79,10 @@ class ItemActivity : AppCompatActivity() {
             MarketplaceTheme {
                 Column {
 
-                    BasicTextField(
-                        value = "Item uuid: " + itemUuid.toString(),
-                        onValueChange = { itemUuid = it }
-                    )
+//                    BasicTextField(
+//                        value = "Item uuid: " + itemUuid.toString(),
+//                        onValueChange = { itemUuid = it }
+//                    )
 
                     ItemDetailScreen(itemUuid = itemUuid.toString(), database = database)
 
@@ -128,13 +134,28 @@ class ItemActivity : AppCompatActivity() {
 
     @Composable
     fun DisplayItemData(item: Item) {
-        Column {
-            Text(text = "Name: ${item.name}")
-            Text(text = "Description: ${item.description}")
-            // Text(text = "Images: ${item.images}")
+        Column (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(15.dp)
+        ) {
+
+
+
+            Text(text = "${item.name}", fontWeight = FontWeight.Bold, fontSize = 30.sp)
             Text(text = "Location: ${item.location}")
-            Text(text = "Price: ${item.price}")
-            Text(text = "Seller ID: ${item.sellerId}")
+
+            Spacer(modifier = Modifier.padding(15.dp))
+
+            Text(text = "Description: ${item.description}")
+
+            Spacer(modifier = Modifier.padding(20.dp))
+
+            Text(text = "€ " + item.price, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+            Text(text = "UUID: " + item.itemUuid, fontSize = 15.sp, color = Color(30, 30, 30, 100))
+
+            // Text(text = "Seller ID: ${item.sellerId}")
         }
     }
 
