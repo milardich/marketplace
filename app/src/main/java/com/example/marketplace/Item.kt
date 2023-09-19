@@ -17,5 +17,8 @@ data class Item(
     var price: Double = 0.0,
 
     @PropertyName("sellerId")
-    var sellerId: String = ""
+    var sellerId: String = "",
+
+    @PropertyName("images")
+    var images: List<String> = arrayListOf()
 )
