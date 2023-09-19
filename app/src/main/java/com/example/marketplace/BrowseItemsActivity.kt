@@ -4,20 +4,15 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -26,8 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.marketplace.ui.theme.MarketplaceTheme
@@ -41,6 +36,7 @@ class BrowseItemsActivity : AppCompatActivity() {
 
     val database = Firebase.database.reference
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_browse_items)
@@ -48,15 +44,52 @@ class BrowseItemsActivity : AppCompatActivity() {
         setContent {
             MarketplaceTheme {
 
-
                 var itemList: List<Item> by remember { mutableStateOf(emptyList()) }
 
-                GetAllItems { items ->
-                    itemList = items
+                var minimumPrice by remember { mutableStateOf("") }
+                var maximumPrice by remember { mutableStateOf("") }
+                var test1 by remember { mutableStateOf("") }
+                var test2 by remember { mutableStateOf("") }
+                // var itemFilter: ItemFilter = ItemFilter(99.99, 112.2)
+                var itemFilter by remember { mutableStateOf<ItemFilter>(ItemFilter(0.0, 0.0)) }
+
+
+
+                Column {
+                    Column (modifier = Modifier.padding(10.dp)){
+                        OutlinedTextField(
+                            value = minimumPrice,
+                            onValueChange = { minimumPrice = it },
+                            label = { androidx.compose.material.Text("Minimum price") },
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        OutlinedTextField(
+                            value = maximumPrice,
+                            onValueChange = { maximumPrice = it },
+                            label = { androidx.compose.material.Text("Maximum price") },
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Button(onClick = {
+                            if(minimumPrice.isEmpty()) {
+                                minimumPrice = "0.1"
+                            }
+                            if(maximumPrice.isEmpty()) {
+                                maximumPrice = "0.1"
+                            }
+                            itemFilter = ItemFilter(minimumPrice.toDouble(), maximumPrice.toDouble())
+                        }, modifier = Modifier.fillMaxWidth()) {
+                            Text(text = "Filter items")
+                        }
+                        // Text(text = "${itemFilter.minimumPrice} - ${itemFilter.maximumPrice}")
+                    }
+
+                    GetAllItems ({ items -> itemList = items }, itemFilter = itemFilter)
+
+                    DisplayItems(itemList)
                 }
 
-                // Display the items using DisplayItems Composable
-                DisplayItems(itemList)
 
                 NavigationButtons(context = this)
             }
@@ -64,7 +97,7 @@ class BrowseItemsActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun GetAllItems(onItemsLoaded: (List<Item>) -> Unit) {
+    fun GetAllItems(onItemsLoaded: (List<Item>) -> Unit, itemFilter: ItemFilter) {
         val itemList: MutableList<Item> = mutableListOf()
 
         database.child("items").addValueEventListener(object : ValueEventListener {
@@ -76,8 +109,26 @@ class BrowseItemsActivity : AppCompatActivity() {
                     }
                 }
 
+//                Toast.makeText(
+//                    baseContext,
+//                    "Loading items...",
+//                    Toast.LENGTH_SHORT,
+//                ).show()
+
                 // Notify the caller that items have been loaded
-                onItemsLoaded(itemList)
+                if(itemFilter.minimumPrice.isNaN() || itemFilter.maximumPrice.isNaN() || itemFilter.minimumPrice <= 0.1 || itemFilter.maximumPrice < itemFilter.minimumPrice) {
+                    onItemsLoaded(itemList)
+                }
+                else {
+                    val filteredItemList: MutableList<Item> = mutableListOf()
+                    itemList.forEach { item ->
+                        if(item.price >= itemFilter.minimumPrice && item.price <= itemFilter.maximumPrice) {
+                            filteredItemList.add(item)
+                        }
+                    }
+                    onItemsLoaded(filteredItemList)
+                }
+//                onItemsLoaded(itemList)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

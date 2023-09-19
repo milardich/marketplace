@@ -110,9 +110,9 @@ class LoginActivity : ComponentActivity() {
         )
     }
 
-    fun goToItemsActivity() {
+    fun goToBrowseItemsActivity() {
         startActivity(
-            Intent(this, AddItemActivity::class.java)
+            Intent(this, BrowseItemsActivity::class.java)
         )
     }
 
@@ -129,7 +129,7 @@ class LoginActivity : ComponentActivity() {
                         "Login successfull.",
                         Toast.LENGTH_SHORT,
                     ).show()
-                    goToItemsActivity()
+                    goToBrowseItemsActivity()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.exception)
