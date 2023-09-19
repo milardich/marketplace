@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.marketplace.ui.theme.MarketplaceTheme
@@ -69,8 +72,6 @@ class ItemActivity : AppCompatActivity() {
         setContent {
             MarketplaceTheme {
                 Column {
-                    
-                    ItemImagesScreen(itemUuid = itemUuid.toString(), database = database)
 
                     BasicTextField(
                         value = "Item uuid: " + itemUuid.toString(),
@@ -78,6 +79,7 @@ class ItemActivity : AppCompatActivity() {
                     )
 
                     ItemDetailScreen(itemUuid = itemUuid.toString(), database = database)
+
                 }
             }
         }
@@ -111,7 +113,11 @@ class ItemActivity : AppCompatActivity() {
         }
 
         if (item != null) {
-            DisplayItemData(item = item!!)
+            Column {
+                DisplayItemImages(item = item!!)
+                DisplayItemData(item = item!!)
+            }
+
         } else {
             // Display loading or error state here if needed
         }
@@ -123,58 +129,25 @@ class ItemActivity : AppCompatActivity() {
         Column {
             Text(text = "Name: ${item.name}")
             Text(text = "Description: ${item.description}")
+            // Text(text = "Images: ${item.images}")
             Text(text = "Location: ${item.location}")
             Text(text = "Price: ${item.price}")
             Text(text = "Seller ID: ${item.sellerId}")
         }
     }
 
-    // images shit
-    @Composable
-    fun ItemImagesScreen(itemUuid: String, database: DatabaseReference) {
-        var item by remember { mutableStateOf<Item?>(null) }
-
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    val itemData = snapshot.getValue(Item::class.java)
-                    item = itemData
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Handle error if data fetch fails
-            }
-        }
-
-        DisposableEffect(itemUuid) {
-            val query = database.child("items").child(itemUuid)
-            query.addListenerForSingleValueEvent(listener)
-
-            onDispose {
-                // Remove the listener when the composable is disposed
-                query.removeEventListener(listener)
-            }
-        }
-
-        if (item != null) {
-            DisplayItemImages(item = item!!)
-        } else {
-            // Display loading or error state here if needed
-        }
-    }
 
     @Composable
     fun DisplayItemImages(item: Item) {
-        // TODO
-        val imageUris = listOf<String>()
-        var test = ""
+
+        var mutableImageUris = item.images.split(",").toMutableList()
+        mutableImageUris.remove("")
+
+        val imageUris = mutableImageUris.toList()
+
         Column() {
-//            val images = listOf("https://media.npr.org/assets/img/2021/08/11/gettyimages-1279899488_wide-f3860ceb0ef19643c335cb34df3fa1de166e2761-s1100-c50.jpg",
-//                "https://cdn.pixabay.com/photo/2017/02/20/18/03/cat-2083492__480.jpg",
-//                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrfPnodZbEjtJgE-67C-0W9pPXK8G9Ai6_Rw&usqp=CAU",
-//                "https://i.ytimg.com/vi/E9iP8jdtYZ0/maxresdefault.jpg",
-//                "https://cdn.shopify.com/s/files/1/0535/2738/0144/articles/shutterstock_149121098_360x.jpg")
+            val testImages = listOf("https://firebasestorage.googleapis.com/v0/b/marketplace-741a4.appspot.com/o/e4d51149-2b07-4473-a29c-8f7ef9b79376%2F1?alt=media&token=383ee199-2fd4-4e67-b595-fcf3122fe629",
+                "https://firebasestorage.googleapis.com/v0/b/marketplace-741a4.appspot.com/o/e4d51149-2b07-4473-a29c-8f7ef9b79376%2F0?alt=media&token=106b406c-59f0-4bec-bac3-bdf034341c07")
 
             ImageSlider(imageUris)
         }
@@ -186,11 +159,10 @@ class ItemActivity : AppCompatActivity() {
         var isAnimating by remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
 
             Box(modifier = Modifier
-                .weight(1f)
-                .height(100.dp)
+                .height(250.dp)
                 .fillMaxWidth()
                 .padding(16.dp)) {
                 // Scrollable Row of Cards
@@ -221,6 +193,7 @@ class ItemActivity : AppCompatActivity() {
                             AsyncImage(
                                 model = image,
                                 contentDescription = null,
+                                modifier = Modifier.fillMaxSize()
                             )
                         }
                     }
