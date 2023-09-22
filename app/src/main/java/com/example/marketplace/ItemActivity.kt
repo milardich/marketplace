@@ -1,8 +1,10 @@
 package com.example.marketplace
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -131,8 +133,15 @@ class ItemActivity : AppCompatActivity() {
                 
                 if(item!!.sellerId == auth.uid) {
                     Button(onClick = {
-
                         database.child("items").child(itemUuid.toString()).removeValue()
+
+                        Toast.makeText(
+                            this@ItemActivity,
+                            "Item deleted...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        openActivity(this@ItemActivity, BrowseItemsActivity::class.java)
 
                     }) {
                         Text(text = "Delete item")
@@ -237,6 +246,12 @@ class ItemActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun openActivity(context: Context, activityClass: Class<*>) {
+        var openItemIntent: Intent
+        openItemIntent = Intent(context, activityClass)
+        context.startActivity(openItemIntent)
     }
 
 }
