@@ -1,8 +1,10 @@
 package com.example.marketplace
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +21,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.marketplace.ui.theme.MarketplaceTheme
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -50,6 +54,7 @@ import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 
 class ItemActivity : AppCompatActivity() {
@@ -84,7 +89,8 @@ class ItemActivity : AppCompatActivity() {
 //                        onValueChange = { itemUuid = it }
 //                    )
 
-                    ItemDetailScreen(itemUuid = itemUuid.toString(), database = database)
+                    ItemDetailScreen(itemUuid = itemUuid.toString(), database = database, auth)
+
 
                 }
 
@@ -94,7 +100,7 @@ class ItemActivity : AppCompatActivity() {
     }
 
     @Composable
-    fun ItemDetailScreen(itemUuid: String, database: DatabaseReference) {
+    fun ItemDetailScreen(itemUuid: String, database: DatabaseReference, auth: FirebaseAuth) {
         var item by remember { mutableStateOf<Item?>(null) }
 
         val listener = object : ValueEventListener {
@@ -124,6 +130,23 @@ class ItemActivity : AppCompatActivity() {
             Column {
                 DisplayItemImages(item = item!!)
                 DisplayItemData(item = item!!)
+                
+                if(item!!.sellerId == auth.uid) {
+                    Button(onClick = {
+                        database.child("items").child(itemUuid.toString()).removeValue()
+
+                        Toast.makeText(
+                            this@ItemActivity,
+                            "Item deleted...",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        openActivity(this@ItemActivity, BrowseItemsActivity::class.java)
+
+                    }) {
+                        Text(text = "Delete item")
+                    }
+                }
             }
 
         } else {
@@ -223,6 +246,12 @@ class ItemActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    fun openActivity(context: Context, activityClass: Class<*>) {
+        var openItemIntent: Intent
+        openItemIntent = Intent(context, activityClass)
+        context.startActivity(openItemIntent)
     }
 
 }
